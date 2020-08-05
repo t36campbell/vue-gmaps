@@ -18,7 +18,7 @@
           <v-card-subtitle>1,000 miles of wonder</v-card-subtitle>
             <v-card-text>
                 <gmap-autocomplete
-                    class="col-md-6 text-black form-control rounded-0"
+                    class="col-md-6 rounded-0"
                     @place_changed="[setPlace($event), addMarker($event)]"
                 ></gmap-autocomplete>
             </v-card-text>
