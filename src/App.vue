@@ -10,7 +10,7 @@
         <v-list-item
           v-for="item in items"
           :key="item.text"
-          link
+          v-on:click="route(item.path)"
         >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -85,41 +85,37 @@
     </v-app-bar>
 
     <v-main>
-      <v-container class="fill-height">
-        <v-row
-          justify="center"
-          align="center"
-        >
-          <HelloWorld />
-        </v-row>
-      </v-container>
+      <router-view/>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import router from './router';
 
 export default Vue.extend({
   name: 'App',
 
-  components: {
-    HelloWorld,
-  },
+  components: {},
   props: {
     source: String,
   },
   data: () => ({
     drawer: null,
     items: [
-      { icon: 'mdi-trending-up', text: 'Most Popular' },
-      { icon: 'mdi-youtube-subscription', text: 'Subscriptions' },
-      { icon: 'mdi-history', text: 'History' },
-      { icon: 'mdi-playlist-play', text: 'Playlists' },
-      { icon: 'mdi-clock', text: 'Watch Later' },
+      { icon: 'mdi-trending-up', text: 'Home', path: '/' },
+      { icon: 'mdi-youtube-subscription', text: 'Stores', path: 'stores' },
+      { icon: 'mdi-history', text: 'History', path: '' },
+      { icon: 'mdi-playlist-play', text: 'Playlists', path: '' },
+      { icon: 'mdi-clock', text: 'Watch Later', path: '' },
     ],
   }),
+  methods: {
+    route(path: string) {
+      router.push(path);
+    },
+  },
 });
 </script>
 
