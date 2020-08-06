@@ -1,4 +1,4 @@
-# vue-gallery
+# new-gallery
 
 ## Project setup
 ```

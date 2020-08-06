@@ -4,7 +4,6 @@ import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import vuetify from './plugins/vuetify';
-// VGM Config
 import vgmAPIKey from './vgm-config';
 
 Vue.config.productionTip = false;
@@ -14,6 +13,7 @@ Vue.use(VueGoogleMaps, {
     libraries: 'places',
   },
 });
+
 new Vue({
   router,
   vuetify,

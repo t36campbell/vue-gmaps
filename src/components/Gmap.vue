@@ -278,7 +278,11 @@ export default {
       },${this.currentPlace.lng}&radius=${this.radius * 1000}
         &keyword=${this.keyword}&key=${vgmAPIKey}`;
       axios
-        .get(URL)
+        .get(URL, {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
         .then((response) => {
           this.data = response.data.results;
           this.addResults();

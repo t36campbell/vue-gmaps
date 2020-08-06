@@ -98,9 +98,6 @@ export default Vue.extend({
   name: 'App',
 
   components: {},
-  props: {
-    source: String,
-  },
   data: () => ({
     drawer: null,
     items: [
@@ -112,7 +109,7 @@ export default Vue.extend({
     ],
   }),
   methods: {
-    route(path: string) {
+    route(path) {
       router.push(path);
     },
   },
