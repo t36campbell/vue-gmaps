@@ -14,7 +14,6 @@ Vue.use(VueGoogleMaps, {
     libraries: 'places',
   },
 });
-
 new Vue({
   router,
   vuetify,
