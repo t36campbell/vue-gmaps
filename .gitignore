@@ -3,7 +3,7 @@ node_modules
 /dist
 
 # private configs
-vgm-config.ts
+vgm-config.js
 
 # local env files
 .env.local
