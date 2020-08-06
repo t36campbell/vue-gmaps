@@ -16,7 +16,7 @@
     "vue-property-decorator": "^8.4.2",
     "vue-router": "^3.4.0",
     "vue2-google-maps": "^0.10.7",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.3.7"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.33.0",
