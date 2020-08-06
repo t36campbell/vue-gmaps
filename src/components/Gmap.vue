@@ -3,94 +3,128 @@
     <v-row dense>
       <v-col :cols="12">
         <v-card>
-          <gmap-map :center="center" :zoom="zoom" style="width:100%;  height: 550px">
-            <gmap-marker
-              :key="index"
-              v-for="(m, index) in markers"
-              :position="m.position"
-              :clickable="true"
-              :icon="m.icon"
-              @click="center=m.position, zoom=9"
-            ></gmap-marker>
-          </gmap-map>
-          <v-card-title>Products Avaialable at all Major Retailers</v-card-title>
-          <v-card-subtitle>Search for Location or Use Your Current Location</v-card-subtitle>
-          <v-card-text>
-            <v-progress-linear
-              :active="loading"
-              :indeterminate="loading"
-              absolute
-              top
-              color="secondary"
-            ></v-progress-linear>
-            <gmap-autocomplete
-              class="col-md-12 rounded-lg form-input"
-              @place_changed="[setPlace($event), addMarker($event), timeout = 1000, loading = true]"
-            ></gmap-autocomplete>
-            <br><br>
-            <h3 class="text-center">OR</h3>
-            <br>
+          <v-img>
+            <gmap-map :center="center" :zoom="zoom" style="width:100%;  height: 550px">
+              <gmap-marker
+                :key="index"
+                v-for="(m, index) in markers"
+                :position="m.position"
+                :clickable="true"
+                :icon="m.icon"
+                @click="center=m.position, zoom=9"
+              ></gmap-marker>
+            </gmap-map>
+          </v-img>
+          <v-expansion-panels v-model="panel">
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                <v-card-title>Products Avaialable at All Major Retailers</v-card-title>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-card-subtitle>Search for Location or Use Your Current Location</v-card-subtitle>
+                <v-card-text>
+                  <v-progress-linear
+                    :active="loading"
+                    :indeterminate="loading"
+                    absolute
+                    top
+                    color="secondary"
+                  ></v-progress-linear>
+                  <gmap-autocomplete
+                    class="col-md-12 rounded-lg form-input"
+                    @place_changed="[
+                      setPlace($event),
+                      addMarker($event),
+                      timeout = 1000,
+                      loading = true
+                    ]"
+                  ></gmap-autocomplete>
+                  <br />
+                  <br />
+                  <h3 class="text-center">OR</h3>
+                  <br />
+                  <v-btn
+                    class="col-md-12 rounded-lg"
+                    color="secondary"
+                    @click="[geolocate(), timeout = 1000, loading = true]"
+                    large
+                    outlined
+                  >Use My Current Location</v-btn>
+                  <br />
+                  <br />
+                  <v-select
+                    class="col-md-12 rounded-lg"
+                    v-model="radius"
+                    :items="radiusOptions"
+                    menu-props="auto"
+                    label="Search Radius"
+                    solo
+                  ></v-select>
+                  <v-select
+                    class="col-md-12 rounded-lg"
+                    v-model="keyword"
+                    :items="keywordOptions"
+                    menu-props="auto"
+                    label="Stores"
+                    solo
+                  ></v-select>
+                </v-card-text>
+                <v-card-actions class="text-center">
+                  <v-btn
+                    class="col-md-12 rounded-lg"
+                    color="accent"
+                    @click="[findNearby(), panel= null, timeout = 3000, loading = true]"
+                    large
+                  >Search for Stores</v-btn>
+                </v-card-actions>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row dense v-if="hasSelected">
+      <v-col v-for="card in selected" :key="card.store.id" :cols="12">
+        <v-card height="300px" color="info">
+          <div class="d-flex flex-no-wrap justify-space-between">
+            <div>
+              <v-card-title class="headline text--black" v-text="card.store.title"></v-card-title>
+              <v-card-subtitle class="text--grey" v-text="card.store.address"></v-card-subtitle>
+            </div>
+          </div>
+          <v-card-actions>
             <v-btn
               class="col-md-12 rounded-lg"
-              color="secondary"
-              @click="[geolocate(), timeout = 1000, loading = true]"
+              color="colors.grey"
+              @click="[timeout = 1000, loading = true]"
               large
               outlined
-            >Use My Current Location</v-btn>
-            <br><br>
-            <v-select
-              class="col-md-12 rounded-lg"
-              v-model="radius"
-              :items="radiusOptions"
-              menu-props="auto"
-              label="Search Radius"
-              solo
-            ></v-select>
-            <v-select
-              class="col-md-12 rounded-lg"
-              v-model="keyword"
-              :items="keywordOptions"
-              menu-props="auto"
-              label="Stores"
-              solo
-            ></v-select>
-          </v-card-text>
-          <v-card-actions class="text-center">
-            <v-btn
-              class="col-md-12 rounded-lg"
-              color="accent"
-              @click="[findNearby(), timeout = 3000, loading = true]"
-              large
-            >Search for Stores</v-btn>
+            >Get Directions</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
     <v-row dense v-if="hasCards">
-        <v-col
-          v-for="card in cards"
-          :key="card.store.id"
-          :cols="4"
-        >
-          <v-card
-            height="150px"
-            color="info"
-          >
-            <div class="d-flex flex-no-wrap justify-space-between">
-              <div>
-                <v-card-title
-                  class="headline text--black"
-                  v-text="card.store.title"
-                ></v-card-title>
-                <v-card-subtitle
-                  class="text--grey"
-                  v-text="card.store.address"
-                ></v-card-subtitle>
-              </div>
+      <v-col v-for="card in cards" :key="card.store.id" :cols="4">
+        <v-card height="200px">
+          <div class="d-flex flex-no-wrap justify-space-between">
+            <div>
+              <v-card-title class="headline text--black" v-text="card.store.title"></v-card-title>
+              <v-card-subtitle class="text--grey" v-text="card.store.address"></v-card-subtitle>
             </div>
-          </v-card>
-        </v-col>
-      </v-row>
+          </div>
+          <v-card-actions class="text-center">
+            <v-btn
+              class="col-md-12 rounded-lg"
+              color="color.grey"
+              @click="[selectStore(card.store), timeout = 1000, loading = true]"
+              large
+              outlined
+            >Select Store</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -116,11 +150,12 @@ export default {
     radius: '25',
     radiusOptions: ['25', '50', '100'],
     keyword: 'Best Buy',
-    keywordOptions: [
-      'Best Buy', 'Target', 'Walmart', 'Home Depot', "Lowe's",
-    ],
+    keywordOptions: ['Best Buy', 'Target', 'Walmart', 'Home Depot', "Lowe's"],
+    panel: 0,
     loading: false,
     timeout: 1000,
+    selected: [],
+    hasSelected: false,
     cards: [],
     hasCards: false,
   }),
@@ -202,7 +237,7 @@ export default {
       }
     },
     addResults() {
-      console.log(this.data);
+      this.cards = [];
       this.data.forEach((result) => {
         const marker = {
           lat: result.geometry.location.lat,
@@ -219,9 +254,13 @@ export default {
         this.cards.push({ store });
         this.hasCards = true;
       });
-      this.zoom = 9;
+      this.zoom = 10;
       this.saveResults();
-      console.log(this.cards);
+    },
+    selectStore(store) {
+      this.selected = [];
+      this.selected.push({ store });
+      this.hasSelected = true;
     },
     geolocate() {
       const options = {
@@ -261,15 +300,18 @@ export default {
       localStorage.zoom = this.zoom;
       localStorage.setItem('currentPlace', JSON.stringify(this.currentPlace));
       localStorage.setItem('center', JSON.stringify(this.center));
+      const recentData = JSON.stringify(this.data);
+      localStorage.removeItem('data');
+      localStorage.setItem('data', recentData);
       const recentResults = JSON.stringify(
         this.results.slice(Math.max(this.places.length - 25, 0)),
       );
+      localStorage.removeItem('results');
       localStorage.setItem('results', recentResults);
-      const recentData = JSON.stringify(this.data);
-      localStorage.setItem('data', recentData);
       const recentCards = JSON.stringify(
         this.cards.slice(Math.max(this.places.length - 25, 0)),
       );
+      localStorage.removeItem('cards');
       localStorage.setItem('cards', recentCards);
     },
     findNearby() {
@@ -297,9 +339,7 @@ export default {
 
 <style>
 .form-input {
-  border: 1px solid #BDBDBD;
-}
-.form-input:focus {
-  border: 1px solid #1B5E20 !important;
+  color: #757575;
+  border: 1px solid #757575;
 }
 </style>
