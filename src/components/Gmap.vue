@@ -4,7 +4,7 @@
       <v-col :cols="12">
         <v-card>
           <v-img>
-            <gmap-map :center="center" :zoom="zoom" style="width:100%;  height: 550px">
+            <gmap-map ref="map" :center="center" :zoom="zoom" style="width:100%;  height: 550px">
               <gmap-marker
                 :key="index"
                 v-for="(m, index) in markers"
@@ -96,7 +96,7 @@
             <v-btn
               class="col-md-12 rounded-lg"
               color="colors.grey"
-              @click="[timeout = 1000, loading = true]"
+              @click="[getDirections(), timeout = 1000, loading = true]"
               large
               outlined
             >Get Directions</v-btn>
@@ -164,6 +164,10 @@ export default {
       if (!val) return;
       // eslint-disable-next-line no-return-assign
       setTimeout(() => (this.loading = false), this.timeout);
+    },
+    hasCards(val) {
+      if (!val) return;
+      this.panel = null;
     },
   },
   mounted() {
@@ -285,6 +289,32 @@ export default {
           console.log(err);
         },
         options,
+      );
+    },
+    getDirections() {
+      // eslint-disable-next-line no-undef
+      const directionsService = new google.maps.DirectionsService();
+      // eslint-disable-next-line no-undef
+      const directionsDisplay = new google.maps.DirectionsRenderer();
+      directionsDisplay.setMap(this.$refs.map.$mapObject);
+
+      // eslint-disable-next-line no-shadow
+      function calculateAndDisplayRoute(directionsService, directionsDisplay, start, destination) {
+        directionsService.route({
+          origin: start,
+          destination,
+          travelMode: 'DRIVING',
+        }, (response, status) => {
+          if (status === 'OK') {
+            directionsDisplay.setDirections(response);
+          } else {
+            console.log(status);
+          }
+        });
+      }
+      calculateAndDisplayRoute(
+        directionsService, directionsDisplay,
+        this.currentPlace, this.selected[0].store.position,
       );
     },
     saveMap() {
