@@ -57,7 +57,7 @@
                     v-model="radius"
                     :items="radiusOptions"
                     menu-props="auto"
-                    label="Search Radius"
+                    label="Search Radius in Miles"
                     solo
                   ></v-select>
                   <v-select
@@ -79,48 +79,62 @@
                 </v-card-actions>
               </v-expansion-panel-content>
             </v-expansion-panel>
+            <v-expansion-panel v-if="hasDirections">
+              <v-expansion-panel-header>
+                <v-card-title>Directions to {{selected.title}}</v-card-title>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-card-subtitle>
+                  {{selected.address}} - {{selected.dist}} miles away
+                </v-card-subtitle>
+                <v-card-text id="directions">
+                </v-card-text>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
           </v-expansion-panels>
         </v-card>
       </v-col>
     </v-row>
-    <v-row dense v-if="hasSelected">
-      <v-col v-for="card in selected" :key="card.store.id" :cols="12">
-        <v-card height="300px" color="info">
-          <div class="d-flex flex-no-wrap justify-space-between">
-            <div>
-              <v-card-title class="headline text--black" v-text="card.store.title"></v-card-title>
-              <v-card-subtitle class="text--grey" v-text="card.store.address"></v-card-subtitle>
-            </div>
-          </div>
-          <v-card-actions>
-            <v-btn
-              class="col-md-12 rounded-lg"
-              color="colors.grey"
-              @click="[getDirections(), timeout = 1000, loading = true]"
-              large
-              outlined
-            >Get Directions</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
     <v-row dense v-if="hasCards">
-      <v-col v-for="card in cards" :key="card.store.id" :cols="4">
-        <v-card height="200px">
+      <v-col v-for="card in cards" :key="card.id" :cols="4">
+        <v-card height="200px" :color="card.color">
           <div class="d-flex flex-no-wrap justify-space-between">
             <div>
-              <v-card-title class="headline text--black" v-text="card.store.title"></v-card-title>
-              <v-card-subtitle class="text--grey" v-text="card.store.address"></v-card-subtitle>
+              <v-card-title class="headline text--black" v-text="card.title"></v-card-title>
+              <v-card-subtitle class="text--grey" v-text="card.address"></v-card-subtitle>
             </div>
           </div>
-          <v-card-actions class="text-center">
+          <v-card-text>
+            <h6> {{card.distance}} </h6>
+          </v-card-text>
+          <v-card-actions v-if="card.selected !== true">
             <v-btn
               class="col-md-12 rounded-lg"
               color="color.grey"
-              @click="[selectStore(card.store), timeout = 1000, loading = true]"
+              @click="[
+                selectStore(card),
+                timeout = 1000,
+                loading = true,
+                card.selected = true,
+                card.color = 'info',
+              ]"
               large
               outlined
             >Select Store</v-btn>
+          </v-card-actions>
+          <v-card-actions v-if="card.selected">
+            <v-btn
+              class="col-md-12 rounded-lg"
+              color="colors.grey"
+              @click="[
+                getDirections(),
+                timeout = 1000,
+                loading = true,
+                hasDirections =true,
+              ]"
+              large
+              outlined
+            >Get Directions</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -154,10 +168,10 @@ export default {
     panel: 0,
     loading: false,
     timeout: 1000,
-    selected: [],
-    hasSelected: false,
     cards: [],
+    selected: [],
     hasCards: false,
+    hasDirections: false,
   }),
   watch: {
     loading(val) {
@@ -168,6 +182,10 @@ export default {
     hasCards(val) {
       if (!val) return;
       this.panel = null;
+    },
+    hasDirections(val) {
+      if (!val) return;
+      this.panel = 1;
     },
   },
   mounted() {
@@ -204,14 +222,6 @@ export default {
         localStorage.removeItem('results');
       }
     }
-    if (localStorage.getItem('data')) {
-      try {
-        const recents = JSON.parse(localStorage.getItem('data'));
-        this.data = recents;
-      } catch (e) {
-        localStorage.removeItem('data');
-      }
-    }
     if (localStorage.getItem('cards')) {
       this.hasCards = true;
       try {
@@ -240,32 +250,6 @@ export default {
         this.saveMap();
       }
     },
-    addResults() {
-      this.cards = [];
-      this.data.forEach((result) => {
-        const marker = {
-          lat: result.geometry.location.lat,
-          lng: result.geometry.location.lng,
-        };
-        this.markers.push({ position: marker });
-        this.results.push({ position: marker });
-        const store = {
-          id: result.place_id,
-          title: result.name,
-          address: result.vicinity,
-          position: marker,
-        };
-        this.cards.push({ store });
-        this.hasCards = true;
-      });
-      this.zoom = 10;
-      this.saveResults();
-    },
-    selectStore(store) {
-      this.selected = [];
-      this.selected.push({ store });
-      this.hasSelected = true;
-    },
     geolocate() {
       const options = {
         maximumAge: 60000,
@@ -286,35 +270,9 @@ export default {
           this.saveMap();
         },
         (err) => {
-          console.log(err);
+          console.log('geolocate', err);
         },
         options,
-      );
-    },
-    getDirections() {
-      // eslint-disable-next-line no-undef
-      const directionsService = new google.maps.DirectionsService();
-      // eslint-disable-next-line no-undef
-      const directionsDisplay = new google.maps.DirectionsRenderer();
-      directionsDisplay.setMap(this.$refs.map.$mapObject);
-
-      // eslint-disable-next-line no-shadow
-      function calculateAndDisplayRoute(directionsService, directionsDisplay, start, destination) {
-        directionsService.route({
-          origin: start,
-          destination,
-          travelMode: 'DRIVING',
-        }, (response, status) => {
-          if (status === 'OK') {
-            directionsDisplay.setDirections(response);
-          } else {
-            console.log(status);
-          }
-        });
-      }
-      calculateAndDisplayRoute(
-        directionsService, directionsDisplay,
-        this.currentPlace, this.selected[0].store.position,
       );
     },
     saveMap() {
@@ -326,13 +284,65 @@ export default {
       );
       localStorage.setItem('places', recentPlaces);
     },
+    findNearby() {
+      const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
+        this.currentPlace.lat
+      },${this.currentPlace.lng}&radius=${this.radius * 1609.34}
+        &keyword=${this.keyword}&key=${vgmAPIKey}`;
+      axios
+        .get(URL)
+        .then((response) => {
+          this.data = response.data.results;
+          this.addResults();
+        })
+        .catch((error) => {
+          console.log('findNearby', error.message);
+        });
+    },
+    addResults() {
+      this.cards = [];
+      this.data.forEach((result) => {
+        const marker = {
+          lat: result.geometry.location.lat,
+          lng: result.geometry.location.lng,
+        };
+        // eslint-disable-next-line no-undef
+        const p1 = new google.maps.LatLng(
+          this.currentPlace.lat,
+          this.currentPlace.lng,
+        );
+        // eslint-disable-next-line no-undef
+        const p2 = new google.maps.LatLng(
+          marker.lat,
+          marker.lng,
+        );
+        // eslint-disable-next-line no-undef
+        const calc = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
+        const dist = Number((calc / 1609).toFixed(2)); // meters to miles
+        const store = {
+          id: result.place_id,
+          title: result.name,
+          address: result.vicinity,
+          position: marker,
+          distance: dist,
+          selected: false,
+          color: '',
+        };
+        this.markers.push({ position: marker });
+        this.results.push({ position: marker });
+        this.cards.push(store);
+      });
+      this.cards.sort((a, b) => ((a.distance > b.distance) ? 1 : -1));
+      this.hasCards = true;
+      if (this.radius === '25') this.zoom = 10;
+      else if (this.radius === '50') this.zoom = 9;
+      else this.zoom = 8;
+      this.saveResults();
+    },
     saveResults() {
       localStorage.zoom = this.zoom;
       localStorage.setItem('currentPlace', JSON.stringify(this.currentPlace));
       localStorage.setItem('center', JSON.stringify(this.center));
-      const recentData = JSON.stringify(this.data);
-      localStorage.removeItem('data');
-      localStorage.setItem('data', recentData);
       const recentResults = JSON.stringify(
         this.results.slice(Math.max(this.places.length - 25, 0)),
       );
@@ -344,24 +354,40 @@ export default {
       localStorage.removeItem('cards');
       localStorage.setItem('cards', recentCards);
     },
-    findNearby() {
-      const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
-        this.currentPlace.lat
-      },${this.currentPlace.lng}&radius=${this.radius * 1000}
-        &keyword=${this.keyword}&key=${vgmAPIKey}`;
-      axios
-        .get(URL, {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-          },
-        })
-        .then((response) => {
-          this.data = response.data.results;
-          this.addResults();
-        })
-        .catch((error) => {
-          console.log(error.message);
+    selectStore(store) {
+      const i = this.cards.indexOf(store);
+      this.cards.splice(i, 1);
+      this.cards.unshift(store);
+      this.selected = null;
+      this.selected = store;
+      window.scrollTo(0, 0);
+    },
+    getDirections() {
+      // eslint-disable-next-line no-undef
+      const directionsService = new google.maps.DirectionsService();
+      // eslint-disable-next-line no-undef
+      const directionsDisplay = new google.maps.DirectionsRenderer();
+      directionsDisplay.setMap(this.$refs.map.$mapObject);
+
+      // eslint-disable-next-line no-shadow
+      function displayRoute(directionsService, directionsDisplay, start, destination) {
+        directionsService.route({
+          origin: start,
+          destination,
+          travelMode: 'DRIVING',
+        }, (response, status) => {
+          if (status === 'OK') {
+            directionsDisplay.setPanel(document.getElementById('directions'));
+            directionsDisplay.setDirections(response);
+          } else {
+            console.log('getDirections', status);
+          }
         });
+      }
+      displayRoute(
+        directionsService, directionsDisplay,
+        this.currentPlace, this.selected.position,
+      );
     },
   },
 };

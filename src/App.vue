@@ -21,23 +21,6 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item
-          class="mt-4"
-          link
-        >
-          <v-list-item-action>
-            <v-icon color="grey darken-1">mdi-plus-circle-outline</v-icon>
-          </v-list-item-action>
-          <v-list-item-title class="grey--text text--darken-1">Browse Channels</v-list-item-title>
-        </v-list-item>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon color="grey darken-1">mdi-cog</v-icon>
-          </v-list-item-action>
-          <v-list-item-title class="grey--text text--darken-1">
-            Manage Subscriptions
-          </v-list-item-title>
-        </v-list-item>
         <v-list-item>
           <v-list-item-action>
             <v-icon color="grey darken-1">mdi-brightness-4</v-icon>
@@ -103,9 +86,9 @@ export default Vue.extend({
     items: [
       { icon: 'mdi-trending-up', text: 'Home', path: '/' },
       { icon: 'mdi-youtube-subscription', text: 'Stores', path: 'stores' },
-      { icon: 'mdi-history', text: 'History', path: '' },
-      { icon: 'mdi-playlist-play', text: 'Playlists', path: '' },
-      { icon: 'mdi-clock', text: 'Watch Later', path: '' },
+      { icon: 'mdi-image-multiple', text: 'Photos', path: '' },
+      { icon: 'mdi-store', text: 'Products', path: '' },
+      { icon: 'mdi-cog', text: 'Settings', path: '' },
     ],
   }),
   methods: {

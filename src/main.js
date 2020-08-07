@@ -10,7 +10,7 @@ Vue.config.productionTip = false;
 Vue.use(VueGoogleMaps, {
   load: {
     key: vgmAPIKey,
-    libraries: 'places',
+    libraries: ['places', 'geometry'],
   },
 });
 
