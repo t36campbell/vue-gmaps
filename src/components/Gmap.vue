@@ -14,6 +14,13 @@
                 @click="center=m.position, zoom=9"
               ></gmap-marker>
             </gmap-map>
+            <v-progress-linear
+              :active="loading"
+              :indeterminate="loading"
+              absolute
+              top
+              color="secondary"
+            ></v-progress-linear>
           </v-img>
           <v-expansion-panels v-model="panel">
             <v-expansion-panel>
@@ -23,13 +30,6 @@
               <v-expansion-panel-content>
                 <v-card-subtitle>Search for Location or Use Your Current Location</v-card-subtitle>
                 <v-card-text>
-                  <v-progress-linear
-                    :active="loading"
-                    :indeterminate="loading"
-                    absolute
-                    top
-                    color="secondary"
-                  ></v-progress-linear>
                   <gmap-autocomplete
                     class="col-md-12 rounded-lg form-input"
                     @place_changed="[
@@ -101,12 +101,16 @@
           <div class="d-flex flex-no-wrap justify-space-between">
             <div>
               <v-card-title class="headline text--black" v-text="card.title"></v-card-title>
-              <v-card-subtitle class="text--grey" v-text="card.address"></v-card-subtitle>
+              <v-card-subtitle class="text--grey">
+                {{card.address}}
+              </v-card-subtitle>
+            </div>
+            <div>
+              <v-card-subtitle class="text--grey">
+                {{card.distance}} mi
+              </v-card-subtitle>
             </div>
           </div>
-          <v-card-text>
-            <h6> {{card.distance}} </h6>
-          </v-card-text>
           <v-card-actions v-if="card.selected !== true">
             <v-btn
               class="col-md-12 rounded-lg"
@@ -128,7 +132,7 @@
               color="colors.grey"
               @click="[
                 getDirections(),
-                timeout = 1000,
+                timeout = 3000,
                 loading = true,
                 hasDirections =true,
               ]"
