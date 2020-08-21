@@ -7,9 +7,8 @@
         >
           <v-card>
             <v-img
-              :src="selected.url_n"
+              :src="selected.url_z"
               class="white--text align-end"
-              height="600px"
             >
               <v-row dense>
                   <v-col :cols="10">
@@ -71,13 +70,20 @@ export default Vue.extend({
   name: 'Photos',
   props: ['tag', 'hasCards', 'cards'],
   data: () => ({
-    isSelected: true,
-    selected: null,
+    isSelected: false,
+    selected: [],
   }),
-  watch: {},
+  watch: {
+    tag(val) {
+      if (!val) return;
+      // eslint-disable-next-line no-return-assign
+      this.isSelected = false;
+    },
+  },
   mounted() {},
   methods: {
     select(card) {
+      this.selected = [];
       this.selected = card;
       this.isSelected = true;
     },

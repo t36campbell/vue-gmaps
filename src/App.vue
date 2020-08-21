@@ -87,10 +87,9 @@ export default Vue.extend({
     items: [],
     tag: '',
   }),
-  watch: {
-  },
+  watch: {},
   mounted() {
-    this.tag = 'neowise';
+    this.tag = 'iceland';
     this.items = [
       { icon: 'mdi-trending-up', text: 'Home', path: `/search/${this.tag}` },
       { icon: 'mdi-youtube-subscription', text: 'Stores', path: '/stores' },
