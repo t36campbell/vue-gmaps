@@ -8,9 +8,10 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
+    path: '/search/:tag',
     name: 'Home',
     component: Home,
+    props: true,
   },
   {
     path: '/stores',

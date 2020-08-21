@@ -58,6 +58,8 @@
       >
         <v-text-field
           :append-icon-cb="() => {}"
+          v-model="tag"
+          @keyup.enter.native="route(`/search/${tag}`)"
           placeholder="Search..."
           single-line
           append-icon="mdi-magnify"
@@ -73,24 +75,31 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
 import router from './router';
 
 export default Vue.extend({
   name: 'App',
-
   components: {},
   data: () => ({
     drawer: null,
-    items: [
-      { icon: 'mdi-trending-up', text: 'Home', path: '/' },
-      { icon: 'mdi-youtube-subscription', text: 'Stores', path: 'stores' },
-      { icon: 'mdi-image-multiple', text: 'Photos', path: '' },
+    items: [],
+    tag: '',
+  }),
+  watch: {
+  },
+  mounted() {
+    this.tag = 'neowise';
+    this.items = [
+      { icon: 'mdi-trending-up', text: 'Home', path: `/search/${this.tag}` },
+      { icon: 'mdi-youtube-subscription', text: 'Stores', path: '/stores' },
+      { icon: 'mdi-image-multiple', text: 'Tags', path: '' },
       { icon: 'mdi-store', text: 'Products', path: '' },
       { icon: 'mdi-cog', text: 'Settings', path: '' },
-    ],
-  }),
+    ];
+    this.route(`/search/${this.tag}`);
+  },
   methods: {
     route(path) {
       router.push(path);
