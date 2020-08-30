@@ -1,12 +1,12 @@
 <template>
   <div class="home">
-      <v-progress-linear
-        :active="loading"
-        :indeterminate="loading"
-        absolute
-        top
-        color="primary"
-      ></v-progress-linear>
+    <v-progress-linear
+      :active="loading"
+      :indeterminate="loading"
+      absolute
+      top
+      color="primary"
+    ></v-progress-linear>
     <Photos :tag='tag' :hasCards='hasCards' :cards='cards'/>
   </div>
 </template>
