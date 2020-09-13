@@ -110,10 +110,7 @@ export default Vue.extend({
   }),
   watch: {},
   mounted() {
-    if (localStorage.tag) {
-      this.tag = localStorage.tag;
-      this.route(`/search/${this.tag}`, false);
-    } else this.defaultTag();
+    this.defaultTag();
     this.items = [
       {
         icon: 'mdi-trending-up', text: 'Home', path: `/search/${this.tag}`, isHome: true,
@@ -159,8 +156,8 @@ export default Vue.extend({
     },
     changeTag(tag) {
       this.tag = tag;
-      localStorage.tag = this.tag;
-      this.route(`/search/${this.tag}`, false);
+      this.items[0].path = `/search/${this.tag}`;
+      this.route(`/search/${this.tag}`, true);
     },
   },
 });

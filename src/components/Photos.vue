@@ -12,7 +12,13 @@
             >
               <v-row dense>
                   <v-col :cols="10">
-                    <v-card-title v-text="selected.title"></v-card-title>
+                    <v-card-title>
+                      {{
+                        selected.title.length > 112
+                        ? selected.title.substring(0, 111) + '...'
+                        : selected.title
+                      }}
+                    </v-card-title>
                   </v-col>
                   <v-col :cols="2">
                     <v-card-subtitle>
@@ -43,7 +49,11 @@
             >
               <v-row dense>
                   <v-col :cols="10">
-                    <v-card-title v-text="card.title"></v-card-title>
+                    <v-card-title>
+                      {{
+                        card.title.length > 27 ? card.title.substring(0, 26) + '...' : card.title
+                      }}
+                    </v-card-title>
                   </v-col>
                   <v-col :cols="2">
                     <v-card-subtitle>
