@@ -9,14 +9,14 @@ import vuetify from './plugins/vuetify';
 import vgmAPIKey from './vgm-config';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCkClSsMigJ-0Jn0Ny3LwNWmQRtiHOZyLY',
-  authDomain: 'vue-gallery-fe4bb.firebaseapp.com',
-  databaseURL: 'https://vue-gallery-fe4bb.firebaseio.com',
-  projectId: 'vue-gallery-fe4bb',
-  storageBucket: 'vue-gallery-fe4bb.appspot.com',
-  messagingSenderId: '361816645624',
-  appId: '1:361816645624:web:af6395c5543f126716c00d',
-  measurementId: 'G-WK1445X3VE',
+  apiKey: 'AIzaSyDxCgbCQ1RTm8KJxO5T697cKjER79eSQe4',
+  authDomain: 'vue-gmaps-6ff51.firebaseapp.com',
+  databaseURL: 'https://vue-gmaps-6ff51.firebaseio.com',
+  projectId: 'vue-gmaps-6ff51',
+  storageBucket: 'vue-gmaps-6ff51.appspot.com',
+  messagingSenderId: '972237420195',
+  appId: '1:972237420195:web:319dc4748a171c3c3df116',
+  measurementId: 'G-7SDENKS15E',
 };
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
