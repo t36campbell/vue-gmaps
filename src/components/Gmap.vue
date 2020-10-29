@@ -4,7 +4,7 @@
       <v-col :cols="12">
         <v-card>
           <v-img>
-            <gmap-map ref="map" :center="center" :zoom="zoom" style="width:100%;  height: 550px">
+            <gmap-map ref="map" :center="center" :zoom="zoom" style="width:100%;  height: 720px">
               <gmap-marker
                 :key="index"
                 v-for="(m, index) in markers"
@@ -79,25 +79,16 @@
                 </v-card-actions>
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <v-expansion-panel v-if="hasDirections">
-              <v-expansion-panel-header>
-                <v-card-title>Directions to {{selected.title}}</v-card-title>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-card-subtitle>
-                  {{selected.address}} - {{selected.dist}} miles away
-                </v-card-subtitle>
-                <v-card-text id="directions">
-                </v-card-text>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
           </v-expansion-panels>
         </v-card>
       </v-col>
     </v-row>
     <v-row dense v-if="hasCards">
-      <v-col v-for="card in cards" :key="card.id" :cols="4">
-        <v-card height="200px" :color="card.color">
+      <v-col
+        v-for="card in cards" :key="card.id"
+        :cols="card.selected === true ? '12' : '4'"
+      >
+        <v-card :height="card.selected === true ? '100%' : '200px'" :color="card.color">
           <div class="d-flex flex-no-wrap justify-space-between">
             <div>
               <v-card-title class="headline text--black" v-text="card.title"></v-card-title>
@@ -111,6 +102,7 @@
               </v-card-subtitle>
             </div>
           </div>
+          <v-card-text id="directions" v-if="hasDirections"></v-card-text>
           <v-card-actions v-if="card.selected !== true">
             <v-btn
               class="col-md-12 rounded-lg"
@@ -121,16 +113,6 @@
                 loading = true,
                 card.selected = true,
                 card.color = 'info',
-              ]"
-              large
-              outlined
-            >Select Store</v-btn>
-          </v-card-actions>
-          <v-card-actions v-if="card.selected">
-            <v-btn
-              class="col-md-12 rounded-lg"
-              color="colors.grey"
-              @click="[
                 getDirections(),
                 timeout = 3000,
                 loading = true,
@@ -151,6 +133,10 @@ import axios from 'axios';
 import { gmapApi } from 'vue2-google-maps';
 import vgmAPIKey from '../vgm-config';
 
+// eslint-disable-next-line no-undef
+const directionsService = new google.maps.DirectionsService();
+// eslint-disable-next-line no-undef
+const directionsDisplay = new google.maps.DirectionsRenderer();
 export default {
   name: 'Gmap',
   computed: {
@@ -325,12 +311,12 @@ export default {
         const dist = Number((calc / 1609).toFixed(2)); // meters to miles
         const store = {
           id: result.place_id,
+          color: '',
           title: result.name,
           address: result.vicinity,
           position: marker,
           distance: dist,
           selected: false,
-          color: '',
         };
         this.markers.push({ position: marker });
         this.results.push({ position: marker });
@@ -341,6 +327,7 @@ export default {
       if (this.radius === '25') this.zoom = 10;
       else if (this.radius === '50') this.zoom = 9;
       else this.zoom = 8;
+      window.scrollTo(0, 0);
       this.saveResults();
     },
     saveResults() {
@@ -359,30 +346,30 @@ export default {
       localStorage.setItem('cards', recentCards);
     },
     selectStore(store) {
+      if (this.selected) {
+        this.selected.selected = false;
+        this.selected.color = '';
+        this.cards.sort((a, b) => ((a.distance > b.distance) ? 1 : -1));
+        console.log('was true', this.selected);
+      }
       const i = this.cards.indexOf(store);
       this.cards.splice(i, 1);
       this.cards.unshift(store);
-      this.selected = null;
+      this.cards.selected = false;
       this.selected = store;
-      window.scrollTo(0, 0);
     },
     getDirections() {
-      // eslint-disable-next-line no-undef
-      const directionsService = new google.maps.DirectionsService();
-      // eslint-disable-next-line no-undef
-      const directionsDisplay = new google.maps.DirectionsRenderer();
       directionsDisplay.setMap(this.$refs.map.$mapObject);
-
       // eslint-disable-next-line no-shadow
-      function displayRoute(directionsService, directionsDisplay, start, destination) {
-        directionsService.route({
+      function displayRoute(service, display, start, destination) {
+        service.route({
           origin: start,
           destination,
           travelMode: 'DRIVING',
         }, (response, status) => {
           if (status === 'OK') {
-            directionsDisplay.setPanel(document.getElementById('directions'));
-            directionsDisplay.setDirections(response);
+            display.setPanel(document.getElementById('directions'));
+            display.setDirections(response);
           } else {
             console.log('getDirections', status);
           }
@@ -401,5 +388,8 @@ export default {
 .form-input {
   color: #757575;
   border: 1px solid #757575;
+}
+#directions .adp-directions {
+  width: 100%;
 }
 </style>
