@@ -133,10 +133,6 @@ import axios from 'axios';
 import { gmapApi } from 'vue2-google-maps';
 import vgmAPIKey from '../vgm-config';
 
-// eslint-disable-next-line no-undef
-const directionsService = new google.maps.DirectionsService();
-// eslint-disable-next-line no-undef
-const directionsDisplay = new google.maps.DirectionsRenderer();
 export default {
   name: 'Gmap',
   computed: {
@@ -179,6 +175,8 @@ export default {
     },
   },
   mounted() {
+    this.directionsService = null;
+    this.directionsDisplay = null;
     if (localStorage.zoom) this.zoom = Number(localStorage.zoom);
     if (localStorage.getItem('currentPlace')) {
       try {
@@ -350,7 +348,6 @@ export default {
         this.selected.selected = false;
         this.selected.color = '';
         this.cards.sort((a, b) => ((a.distance > b.distance) ? 1 : -1));
-        console.log('was true', this.selected);
       }
       const i = this.cards.indexOf(store);
       this.cards.splice(i, 1);
@@ -358,8 +355,19 @@ export default {
       this.cards.selected = false;
       this.selected = store;
     },
+    googleInit() {
+      if (!this.directionsService) {
+        // eslint-disable-next-line no-undef
+        this.directionsService = new google.maps.DirectionsService();
+      }
+      if (!this.directionsDisplay) {
+        // eslint-disable-next-line no-undef
+        this.directionsDisplay = new google.maps.DirectionsRenderer();
+      }
+    },
     getDirections() {
-      directionsDisplay.setMap(this.$refs.map.$mapObject);
+      this.googleInit();
+      this.directionsDisplay.setMap(this.$refs.map.$mapObject);
       // eslint-disable-next-line no-shadow
       function displayRoute(service, display, start, destination) {
         service.route({
@@ -376,7 +384,7 @@ export default {
         });
       }
       displayRoute(
-        directionsService, directionsDisplay,
+        this.directionsService, this.directionsDisplay,
         this.currentPlace, this.selected.position,
       );
     },
