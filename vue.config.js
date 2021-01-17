@@ -3,6 +3,6 @@ module.exports = {
     'vuetify',
   ],
   devServer: {
-    proxy: 'https://cors-anywhere.herokuapp.com/',
+    proxy: 'https://tsc-cors.herokuapp.com/',
   },
 };

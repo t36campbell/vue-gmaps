@@ -273,7 +273,7 @@ export default {
       localStorage.setItem('places', recentPlaces);
     },
     findNearby() {
-      const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
+      const URL = `https://tsc-cors.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
         this.currentPlace.lat
       },${this.currentPlace.lng}&radius=${this.radius * 1609.34}
         &keyword=${this.keyword}&key=${vgmAPIKey}`;
