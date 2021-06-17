@@ -55,22 +55,6 @@
       <v-toolbar-title class="mr-12 align-center">
         <span class="title secondary--text text--darken-2" >vgm</span>
       </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-row
-        align="center"
-        style="max-width: 650px"
-      >
-        <v-text-field
-          :append-icon-cb="() => {}"
-          v-model="tag"
-          @keyup.enter.native="route(`/search/${tag}`)"
-          placeholder="Search..."
-          single-line
-          append-icon="mdi-magnify"
-          color="secondary darken-2"
-          hide-details
-        ></v-text-field>
-      </v-row>
     </v-app-bar>
 
     <v-main>

@@ -3,8 +3,8 @@
     <v-row dense>
       <v-col :cols="12">
         <v-card>
-          <v-img>
-            <gmap-map ref="map" :center="center" :zoom="zoom" style="width:100%;  height: 720px">
+          <v-img class="map-wrapper">
+            <gmap-map ref="map" :center="center" :zoom="zoom" class="map">
               <gmap-marker
                 :key="index"
                 v-for="(m, index) in markers"
@@ -399,5 +399,16 @@ export default {
 }
 #directions .adp-directions {
   width: 100%;
+}
+.map-wrapper {
+  position: relative;
+  padding-bottom: 41.84%;
+}
+.map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
